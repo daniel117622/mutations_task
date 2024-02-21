@@ -44,6 +44,10 @@ app.post('/mutation', async (req, res) => {
                 {
                     res.status(403).send({"result": "Mutation found"});
                 }
+                else if (message == "FORMAT_ERROR")
+                {
+                    res.status(403).send({"error": "DNA in wrong format"});
+                }
             });
             // For the moment the queue size is shown
             const queueString = JSON.stringify(processingQueue);

@@ -115,7 +115,12 @@ async function processQueueItems() {
             }
             else
             {
-                console.log(`DNA: ${item.id} not valid`)
+                const resolve = processCompletionListeners.get(item.id);
+                if (resolve) 
+                {
+                    resolve("FORMAT_ERROR")
+                    processCompletionListeners.delete(item.id);
+                }
             }
 
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
