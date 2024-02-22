@@ -6,6 +6,29 @@ const { validateDnaRequest, ErrorCode } = require('./validationUtils');
 const { processingQueue, processQueueItems , addToProcessingQueue} = require('./processingQueue.js');
 const hashing = require('crypto')
 app.use(cors());
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGO_KEY, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connection successful'))
+.catch((err) => console.error('MongoDB connection error:', err));
+
+
+const { Schema } = mongoose;
+
+// Define the User schema
+const requestSchema = new Schema({
+  hash: { type: String, unique: true, required: true },
+  data: [String],
+  result: String,
+  date_initiated: Number,
+  date_completed: Number
+});
+const Request = mongoose.model('Request', requestSchema);
+
 // Solo hay un endpoint de tipo POST donde recibe data del usuario. 
 // Esta bien configurar el middleware para todas las rutas
 app.use(express.json({
@@ -41,10 +64,32 @@ app.post('/mutation', async (req, res) => {
                 if (message == "OK")
                 {
                     res.status(200).send({"result": "OK"});
+                    const newRequest = new Request({
+                        hash: q_item.id,
+                        data: q_item.data, // Array of strings
+                        result: 'OK',
+                        date_initiated: q_item.receivedAt,
+                        date_completed: Date.now()
+                      });
+                      
+                      newRequest.save()
+                      .then(doc => console.log('Document inserted:', doc))
+                      .catch(err => {}); // No problem with duplicate keys
                 }
                 else if (message == "MUTATED")
                 {
                     res.status(403).send({"result": "Mutation found"});
+                    const newRequest = new Request({
+                        hash: q_item.id,
+                        data: q_item.data, // Array of strings
+                        result: 'MUTATED',
+                        date_initiated: q_item.receivedAt,
+                        date_completed: Date.now()
+                      });
+                      
+                      newRequest.save()
+                      .then(doc => console.log('Document inserted:', doc))
+                      .catch(err => {}); // No problem with duplicate keys
                 }
                 else if (message == "FORMAT_ERROR")
                 {
@@ -53,7 +98,6 @@ app.post('/mutation', async (req, res) => {
             });
             // For the moment the queue size is shown
             const queueString = JSON.stringify(processingQueue);
-            const sizeInBytes = Buffer.byteLength(queueString, 'utf8');
             
             break;
         case ErrorCode.MISSING_DNA:
@@ -70,6 +114,40 @@ app.post('/mutation', async (req, res) => {
 
 });
 
+app.get('/stats', async (req, res) => {
+    try {
+      // Aggregate query to get counts
+      const stats = await Request.aggregate([
+        {
+          $group: {
+            _id: '$result', // Group by the result
+            count: { $sum: 1 } // Count the number of documents in each group
+          }
+        },
+        {
+          $match: {
+            _id: { $in: ['OK', 'MUTATED'] } // Strings to look for
+          }
+        }
+      ]);
+  
+      const formattedStats = stats.reduce((acc, curr) => {
+        acc[curr._id] = curr.count;
+        return acc;
+      }, {});
+  
+      // Ensure both OK and MUTATED keys exist
+      const finalStats = {
+        OK: formattedStats.OK || 0,
+        MUTATED: formattedStats.MUTATED || 0
+      };
+      
+      res.json({"states" : finalStats});
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      res.status(500).send({ error: 'Internal server error' });
+    }
+  });
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
