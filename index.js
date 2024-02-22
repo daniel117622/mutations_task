@@ -55,6 +55,7 @@ processQueueItems().catch(err => console.error(err));
 // POST endpoint for "/mutation"
 app.post('/mutation', async (req, res) => {
     const validationResult = validateDnaRequest(req);
+    console.log("Request accepted")
     switch (validationResult) 
     {
         case ErrorCode.NO_ERROR:
