@@ -151,7 +151,25 @@ app.get('/stats', async (req, res) => {
     }
   });
 
+app.get('/list', async (req, res) => {
+  const latestRequests = await Request.aggregate([
+      {
+          $sort: {
+          date_completed: -1 // Sort by date_completed in descending order
+          }
+      },
+      {
+          $limit: 10 // Limit the results to the top 10
+      }
+  ]);  
+  console.log(latestRequests)
+  res.send(latestRequests)
+})
+
 app.use((req, res, next) => {
+
+
+
 res.status(404).json({
     message: 'Ohh you are lost, read the API documentation to find your way back home :)'
 })
