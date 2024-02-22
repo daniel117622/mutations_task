@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const port = 80;
 const { validateDnaRequest, ErrorCode } = require('./validationUtils'); 
 const { processingQueue, processQueueItems , addToProcessingQueue} = require('./processingQueue.js');
 const hashing = require('crypto')
+app.use(cors());
 // Solo hay un endpoint de tipo POST donde recibe data del usuario. 
 // Esta bien configurar el middleware para todas las rutas
 app.use(express.json({
