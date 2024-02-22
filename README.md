@@ -18,34 +18,28 @@ This backend service is designed to analyze DNA sequences to detect mutations. I
 Submits a DNA sample for mutation analysis.
 
 **Request Body:**
-```json
+
 {
   "dna": ["ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"]
-}```
+}
+
 **Responses:**
-200 OK if no mutation is found.
-403 Forbidden if a mutation is detected or the DNA format is incorrect.
-GET /stats
+  - 200 OK if no mutation is found.
+  - 403 Forbidden if a mutation is detected or the DNA format is incorrect.
+  - GET /stats
+  - Retrieves the statistics of DNA analysis, including counts of mutations and non-mutations.
+
+#### GET /stats
+**Request Body:**
 Retrieves the statistics of DNA analysis, including counts of mutations and non-mutations.
 
-GET /stats
-Retrieves the statistics of DNA analysis, including counts of mutations and non-mutations.
-
-Response:
-json
-Copy code
 {
   "states": {
     "OK": 10,
     "MUTATED": 5
   }
 }
-GET /list
-Fetches the last 10 processed DNA analysis requests.
 
-GET /list
+#### GET /list
 Fetches the last 10 processed DNA analysis requests.
-
-Response:
-An array of request objects sorted by date_completed in descending order.
 
