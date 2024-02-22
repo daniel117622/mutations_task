@@ -60,28 +60,35 @@ function findSequences(dna)
 
         return transposed;
     }
-    if (checkRows(dna)) 
+    try
     {
-      return true;
+        if (checkRows(dna)) 
+        {
+          return true;
+        }
+      
+        // Checar en tabla provisional
+        const transposedDNA = transposeArray(dna);
+        console.log(transposedDNA)
+        if (checkRows(transposedDNA)) 
+        {
+          return true;
+        }
+        
+        // Se crea tuna tabla provisional de las diagonales
+        const diagonalDNA = getDiagonals(dna);
+        console.log(diagonalDNA)
+        if (checkRows(diagonalDNA)) 
+        {
+            return true;
+        }
+        // Ninguna de las condiciones se cumple    
+        return false;
     }
-  
-    // Checar en tabla provisional
-    const transposedDNA = transposeArray(dna);
-    console.log(transposedDNA)
-    if (checkRows(transposedDNA)) 
+    catch 
     {
-      return true;
+        return false
     }
-    
-    // Se crea tuna tabla provisional de las diagonales
-    const diagonalDNA = getDiagonals(dna);
-    console.log(diagonalDNA)
-    if (checkRows(diagonalDNA)) 
-    {
-        return true;
-    }
-    // Ninguna de las condiciones se cumple    
-    return false;
   }
 
 let processingQueue = [];

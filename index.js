@@ -48,7 +48,9 @@ app.use((err, req, res, next) => {
     }
     next(err);
 });
-
+app.get('/test', (req, res) => {
+    res.send('Test route working');
+  });
 // Activa la cola de procesamiento
 processQueueItems().catch(err => console.error(err));
 
@@ -112,7 +114,6 @@ app.post('/mutation', async (req, res) => {
         default:
             res.status(500).send('Internal server error.');
     }
-
 });
 
 app.get('/stats', async (req, res) => {
@@ -150,12 +151,11 @@ app.get('/stats', async (req, res) => {
     }
   });
 
-  app.use((req, res, next) => {
-    res.status(404).json({
-        message: 'Ohh you are lost, read the API documentation to find your way back home :)'
-    })
-
-  })
+app.use((req, res, next) => {
+res.status(404).json({
+    message: 'Ohh you are lost, read the API documentation to find your way back home :)'
+})
+})
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
