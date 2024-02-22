@@ -11,16 +11,18 @@ This backend service is designed to analyze DNA sequences to detect mutations. I
 - MongoDB (Remote or local installation)
 - An `.env` file configured with your MongoDB connection string
 
-API Endpoints
-POST /mutation
+### API Endpoints
+
+#### POST /mutation
+
 Submits a DNA sample for mutation analysis.
 
-Request Body:
-Copy code
+**Request Body:**
+```json
 {
   "dna": ["ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"]
-}
-Responses:
+}```
+**Responses:**
 200 OK if no mutation is found.
 403 Forbidden if a mutation is detected or the DNA format is incorrect.
 GET /stats
